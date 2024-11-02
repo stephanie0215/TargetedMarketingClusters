@@ -1,0 +1,892 @@
+---
+title: "Final_Project"
+author: "Stephanie (Yung-Hui) Pan"
+output: html_document
+---
+
+# Dataset Description:
+
+-   ID: the unique identification code for every customer
+-   Year_Birth: The Year of a customer's birth
+-   Education: The level of education that a customer completed
+-   Marital_Status: Status of Marriage
+-   Income: Annual Income
+-   Kidhome: \# of children under the age of 13 in Customer's household
+-   Teenhome: \# of children between 13-19 in Customer's household
+-   Dt_Customer: Date of Customer Enrollment
+-   Recency: \# of days since last purchase
+-   MntWines: Dollar amount of Wines purchased in last 2 years
+-   MntFruits: Dollar amount of Fruits purchased in last 2 years
+-   MntMeatProducts: Dollar amount of Meat products purchased in the last 2 years
+-   MntFishProducts: Dollar amount of Fish products purchased in the last 2 years
+-   MntSweetProducts: Dollar amount of Sweet products purchased in the last 2 years
+-   MntGoldProds: Dollar amount of Gold products purchased in the last 2 years
+-   NumDealsPurchases: \# of purchases made with discount
+-   NumWebPurchases: \# of purchases made through the company's website
+-   NumCatalogPurchases: \# of purchases made using the catalog
+-   NumStorePurchases: \# of purchases made directly in-store
+-   NumWebVisitsMonth: \# of visits made through company's website
+-   AcceptedCmp1: 1 if customer accepted the offer in the 1st campaign, 0 otherwise
+-   AcceptedCmp2: 1 if customer accepted the offer in the 2nd campaign, 0 otherwise
+-   AcceptedCmp3: 1 if customer accepted the offer in the 3rd campaign, 0 otherwise
+-   AcceptedCmp4: 1 if customer accepted the offer in the 4th campaign, 0 otherwise
+-   AcceptedCmp5: 1 if customer accepted the offer in the 5th campaign, 0 otherwise
+-   Complain: 1 if customer complained in the last 2 years, 0 otherwise
+-   Response: 1 if customer accepted the offer in the last campaign, 0 otherwise
+
+```{r}
+options(warn = -1)
+Sys.setenv(LANGUAGE = "en")
+```
+
+```{r}
+library(tidyverse)
+library(plyr) #count()
+library(GGally) #ggcorr() and ggpairs()
+library(reshape) #melt()
+library(corrplot) #corrplot
+library(dplyr)
+library(vcd)
+```
+
+```{r}
+#second library import
+library(randomForest)
+library(class)
+library(caret)
+library(ranger)
+library(rsample)
+library(e1071)
+library(cluster)
+library(factoextra)
+```
+
+```{r}
+#import
+marketing=read.table(file = "marketing_campaign.csv", fill = TRUE, header = TRUE)
+head(marketing)
+str(marketing)
+nrow(marketing)
+```
+
+```{r}
+str(marketing)
+```
+
+# Convert the data to the numeric/Date type in order to use the model
+
+```{r}
+#columns that will be made numeric
+col.names<- names(marketing)
+num.cols <- col.names[-c(1,3,4,8)]
+
+marketing <- marketing %>%
+  mutate_at(num.cols, as.numeric) %>%
+  mutate(Dt_Customer = as.Date(Dt_Customer, format = "%d-%m-%Y")) #create Date column
+```
+
+```{r}
+head(marketing)
+```
+
+# Drop missing value
+
+```{r}
+marketing = na.omit(marketing)
+nrow(marketing )
+```
+
+```{r}
+str(marketing)
+```
+
+```{r}
+count(marketing$Marital_Status)
+```
+
+# feature engineering - Marital_Status \>\> Rel_Status
+
+Marital_Status currently has 8 different levels, some of them more populated than others and many being repetitive. While, some of the levels can be combined ('Alone' and 'Single' most likely describe the same experience) others cannot. We don't know what an Absurd or YOLO Marital Status is and therefore we'll have to handle these values differently. Thankfully, the unexpected values are few in between and most Customers can be categorized as Coupled (either Married or Together) and a similarly large proportion are Single (whether that be Alone, Single, Divorced, or Widowed).
+
+```{r}
+#Create New Cohesive Categories
+marketing$Rel_Status[marketing$Marital_Status %in% c('Alone', 'Divorced', 'Widow', 'Single')] <- 'Single'
+marketing$Rel_Status[marketing$Marital_Status %in% c('Married', 'Together')] <- 'Coupled'
+marketing$Rel_Status[marketing$Marital_Status %in% c('Absurd', 'YOLO')] <- '' #insert blanks to be handled later
+# Drop rows where the value in 'column' is equal to 'condition'
+marketing <- subset(marketing,Rel_Status != '')
+nrow(marketing)
+count(marketing$Rel_Status)
+```
+
+```{r}
+count(marketing$Education)
+```
+
+# Outlier Detection - Income
+
+```{r}
+ggplot(marketing, aes(x = Income)) +
+    geom_boxplot()
+```
+
+-   When we plot our Income variable we'll see that most of our data is squished on the left side of the plot while a single point is greater than 600k. Whether this is an error in data entry or just a very wealthy customer is uncertain, but it is an overall outlier that isn't even near our other variables. It doesn't seem like it'll help in our further analysis, so it'll be helpful to get rid of it and rely on the rest of the larger dataset we can pull from.
+
+## Drop the outlier
+
+```{r}
+outliers <- boxplot(marketing$Income, plot = FALSE)$out
+marketing <- marketing %>%
+    filter(Income < max(outliers) - 1)
+```
+
+## Closer look at Z_CostContact,Z_Revenue
+
+```{r}
+#look at unknown variables
+summary(marketing$Z_CostContact)
+ggplot(marketing, aes(x = Z_CostContact)) +
+    geom_boxplot()
+
+```
+
+-   Z_CostContact is a constant, thus it is not helpful in predicting whether the customer would accepted the offer in the last campaign \>\> drop
+
+```{r}
+summary(marketing$Z_Revenue)
+ggplot(marketing, aes(x = Z_Revenue)) +
+    geom_boxplot()
+```
+
+-   Z_Revenue is a constant, thus it is not helpful in predicting whether the customer would accepted the offer in the last campaign \>\> drop
+
+```{r}
+#Date signed up and year of birth
+ggplot(marketing, aes(Dt_Customer)) +
+    geom_density(color = "darkblue", fill = "lightblue") +
+    geom_vline(aes(xintercept = mean(Dt_Customer)), color = 'red', linetype = 'dashed', linewidth = 1)
+ggplot(marketing, aes(Year_Birth)) +
+    geom_density(color = "darkblue", fill = "lightblue") +
+    geom_vline(aes(xintercept = mean(Year_Birth)), color = 'red', linetype = 'dashed', linewidth = 1)
+```
+
+-   A look at variables that refer to a date will give us more context to all of the customers we have.
+
+-   The red dashed line in these plots represents the average of all customers. The average customer then joined around July of 2013 then and was borned near 1970.
+
+-   There is little variation in when Customer's enrolled with our company, but the data seems to be bound to customers and their data between July of 2012 and July of 2014.
+
+-   Additionally, our company seems to be most populated by the Baby Boomer and X Generations, taking a decline when it comes to Millenials, and have no information on GenZers, though that could be accounted for by the fact that this data ended collection in 2014 when many GenZers were too young to make enrollment
+
+# Feature Engineering - Create new columns
+
+```{r}
+marketing <- marketing %>%
+    #creating new variables based off old ones
+  mutate(MntSpent = MntFishProducts + MntMeatProducts + MntFruits + MntSweetProducts + MntWines + MntGoldProds) %>%
+  mutate(NumPurchases = NumCatalogPurchases + NumStorePurchases + NumWebPurchases) %>%
+  mutate(MinorsHome = Kidhome + Teenhome)  %>%
+  mutate(AcceptedPrv = AcceptedCmp1 + AcceptedCmp2 + AcceptedCmp3 + AcceptedCmp4 + AcceptedCmp5) %>%
+  mutate(Age = as.numeric(2023 - Year_Birth)) # Age is the age that registered to be the member, not the current age
+
+```
+
+```{r}
+#marketing <- marketing[order(marketing$column), ]
+
+# Remove using subset
+
+
+marketing <- marketing[, -c(1,2,4,6,7,27,28)]
+new_order = sort(colnames(marketing))
+marketing <- marketing[, new_order]
+marketing = na.omit(marketing)
+head(marketing)
+```
+
+# EDA - Understand Data through Visualization after removing outliers
+
+```{r}
+#comprehensive boxplots
+unwant.cols <- c('AcceptedCmp1', 'AcceptedCmp2', 'AcceptedCmp3', 'AcceptedCmp4', 'AcceptedCmp5', 'Complain',
+             'Education', 'Rel_Status', 'Dt_Customer', 'Response', 'AcceptedPrv')
+melt.marketing <- marketing %>%
+    select(-one_of(unwant.cols)) %>%
+    melt()
+
+ggplot(melt.marketing, aes(factor(variable), value)) +
+    geom_boxplot(color = 'steelblue') +
+    facet_wrap(~variable, scale = 'free') +
+    labs(title = 'Boxplots of Various Variables', x = 'Variables', y = 'Ranges')
+```
+
+```{r}
+#remove outliers from age variable
+outliers <- boxplot(marketing$Age, plot = FALSE)$out
+marketing <- marketing %>%
+    filter(Age < min(outliers))
+```
+
+-   Age: Ironically, there seems to be an anamoly in the Age Boxplot that was not previously cleaned. There are at least two customers whose age was calculated as greater than 100. Because of the rarity of that, it can be assumed that this was probably an error in data entry and we can remove those from the dataset easily enough. Beside that however the Age variable seems pretty normally distributed with the average age being slightly less than 50 years old
+-   Income: Having seen this plot before in the preprocessing stage, the only thing to note is that we no longer have the drastic 600k+ income outlier and now the average salary can easily be seen to be about 50k which is similar to the greater population of people
+-   MinorsHome: Most customers have either no or only 1 kid at home, but 2 and 3 kids at home can also be expected. No customer has more than 3 kids at home
+-   MntFishProducts: This is the first very right-skewed distribution we find. While most customers buy a relatively low amount of fish products, some customers buy more than 200 fish products indicating either mass buying or continued interest in our store
+-   MntFruits: Similar to Fish Products
+-   MntGoldProds: Similar to Fish and Fruit Products
+-   MntMeatProducts: While the boxplot looks similar to the previous product items, a keen eye will catch that the range is scaled differently. It can be expected that a customer will buy a greater proportion of Meat Products from our store than previous products as the mean is easily around 150 dollars and the dollar amount only becomes unusual if it exceeds about \$250
+-   MntSpent: The typical amount of money a customer spent in our stores over the past 2 years is 500 dollars, but up to 50% of the customer base spent upwards of 500 - 2500 dollars.
+-   MntSweetProducts: Similar to Fish Products
+-   MntWines: Similarly to Meat Products, this product is also scaled up, but on average customers can be expected to spend more on Wines than Meat Products meaning it may be the top source of revenue for our company
+-   NumCatalogPurchases: The average number of catalogue purchases a customer makes is around 5, but some customer's enjoy purchasing many items from the catalogue
+-   NumDealsPurchases: Most customers do not take much advantage of our sale deals, only having purchased around 2 items that were a part of a deal. Other customers are much more aware of our deals and purchased upwards of 15 items with a deal
+-   NumPurchases: Being the summation of the places customers can make purchases, this variable is very normally distributed with mean greater than 10 and a range of anywhere between 0 and 30 purchases made
+-   NumStorePurchases: Similarly to NumPurchases, this variable is also normally distributed with an average of about 5 in-store purchases and a range of anywhere between 0 and 13
+-   NumWebPurchases: Our website seems equally utilized as a place for customers to make purchases. Some customers enjoy the website for their purchases much more and make more purchases there
+-   NumWebVisitsMonth: Similar to NumWebPurchases
+-   Recency: Nearly perfectly normally distributed, the average number of days a customer has gone with making a purchase is 50 days (or nearly 2 months) while the maximum number of days a customer has gone without purchasing a product is 100 days (slightly more than 3 months)
+
+```{r}
+#list of products
+products <- c('MntWines', 'MntFruits', 'MntMeatProducts', 'MntFishProducts', 'MntSweetProducts', 'MntGoldProds')
+
+#sum amounts spent on products and set these values in df
+products.df <- marketing %>%
+    select(products) %>% summarize_each(sum) %>%
+    t() %>% as.data.frame() %>%
+    rownames_to_column('Products')
+
+#clean up structures
+colnames(products.df) <- c('Products', 'Sums')
+products <- gsub('Products', '', gsub(c('Mnt'), '', products))
+
+#creating pie chart
+ggplot(products.df, aes(x = '', y = Sums, fill = Products)) +
+    geom_bar(stat = 'identity', width = 1, color = 'black') +
+    geom_text(aes(label = paste('$', Sums)), color = 'white', position = position_stack(vjust = 0.5)) +
+    coord_polar('y', start = 0) +
+    labs(title = 'Percentage of Total Sales from Products', fill = 'Products', 
+         caption = paste('Total Revenue: $', sum(products.df$Sums))) +
+    scale_fill_discrete(labels = sort(products)) +
+    theme(axis.ticks=element_blank(), axis.text.y=element_blank(), axis.text.x=element_text(colour='black'),
+                axis.title=element_blank()) +
+    scale_y_continuous(breaks = cumsum(products.df$Sums) - products.df$Sums / 2,
+                       labels = paste(round(products.df$Sums/sum(products.df$Sums) * 100, 1), '%'))
+```
+
+-   Wines easily account for a majority of total sales (at 51%), with meat products being a second with nearly half the sales as Wines (at 27.5%). Other products accrue a similar amount of sales. Total Sales in the past 2 years sits at \$1,244,378
+
+```{r}
+purchase <- c('NumCatalogPurchases', 'NumStorePurchases', 'NumWebPurchases')
+
+purchase.df <- marketing %>%
+    select(purchase) %>% summarize_each(sum) %>%
+    t() %>% as.data.frame() %>%
+    rownames_to_column('Place')
+
+colnames(purchase.df) <- c('Place', 'Sums')
+purchase <- gsub('Purchases', '', gsub(c('Num'), '', purchase))
+
+ggplot(purchase.df, aes(x = '', y = Sums, fill = Place)) +
+    geom_bar(stat = 'identity', width = 1, color = 'black') +
+    geom_text(aes(label = paste(Sums)), color = 'white', position = position_stack(vjust = 0.5)) +
+    coord_polar('y', start = 0) +
+    labs(title = 'Percentage of Total Num of Purchases', fill = 'Places', 
+         caption = paste('Total Num: ', sum(purchase.df$Sums))) +
+    scale_fill_discrete(labels = sort(purchase)) +
+    theme(axis.ticks=element_blank(), axis.text.y=element_blank(), axis.text.x=element_text(colour='black'),
+                axis.title=element_blank()) +
+    scale_y_continuous(breaks = cumsum(purchase.df$Sums) - purchase.df$Sums / 2,
+                       labels = paste(round(purchase.df$Sums/sum(purchase.df$Sums) * 100, 1), '%'))
+```
+
+-   Most of our sales do come from our store, but our web portal and catalogue are far from underutilized. Total number of purchases we've gotten in the past 2 years is 25,484.
+
+```{r}
+#correlation plot between numeric vectors
+Correlation_plot <- ggcorr(select(marketing, -one_of(unwant.cols)), 
+                           geom = 'blank', label = TRUE, hjust = 1.2,wjust = 1, layout.exp = 3) +
+    geom_point(size = 10, aes(color = coefficient > 0, alpha = abs(coefficient) > 0.6)) +
+    scale_alpha_manual(values = c('TRUE' = 0.25, 'FALSE' = 0)) +
+    guides(color = 'none', alpha = 'none') +
+    labs(title = 'Correlation Map')
+
+Correlation_plot
+```
+
+-   Here we have a map of the correlation between our numerical variables. Correlations of 0.6 or above are circled in a light blue color while correlations of -0.6 and below are circled in a light red color. There seem to be far more positively correlated variables than there are negatively correlated variables.
+
+-   Some positive correlations are due to one variable being a sum of many. For example, obviously MntSpent and NumPurchases will be positively correlated with their components. They should also be expected to be positively correlated with each other as well as the more you spend the more number of purchases we should expect a customer to make.
+
+-   The most positively correlated data that are not so clear to us however include Income to MntSpent, suggesting that as a customer's Income increases we can expect them to spend more on our products. MntMeatProducts and NumCatalogPurchases are also correlated together, suggesting that many customers purchase our meat products from the catalogue and not in-store or on our website.
+
+-   Other variables have no significant correlations with any variable- like Age and Recency.
+
+-   The only negatively correlated relationship we have is between Income and NumWebVisitsMonth. However, Income and NumWebPurchases are not negatively correlated. This indicates that customers with lower incomes are expected to visit our website more but make a similar number of purchases as their higher income counterparts.
+
+We can see the more interesting correlations in individual scatterplots:
+
+```{r}
+#income v mntspent
+ggplot(marketing, aes(x = MntSpent, y = Income)) +
+    geom_point() +
+    geom_smooth(method = lm) +
+    labs(title = 'Income Against Amount Spent', x = 'Amount Spent ($)', y = 'Yearly Income ($)')
+```
+
+```{r}
+#income by age
+ggplot(marketing, aes(x = NumWebVisitsMonth, y = Income)) +
+    geom_point() +
+    geom_smooth(method = lm) +
+    labs(title = 'Income Against Age', x = '# of Web Visits per Month', y = 'Yearly Income ($)')
+```
+
+```{r}
+#pie chart of complaints
+complaint.counts <- count(marketing$Complain)
+ggplot(complaint.counts, aes(x = '', y = freq, fill = as.character(x))) +
+    geom_bar(stat = 'identity', width = 1) +
+    coord_polar('y', start = 0) +
+    labs(title = 'Share of Complaints', subtitle = 'In the last 2 Years') +
+    scale_fill_discrete(name = "Complant?", labels = c("No", "Yes")) +
+    theme_void()
+```
+
+```{r}
+#boxplot Income by accepted previous
+ggplot(marketing, aes(x = as.character(AcceptedPrv), y = Income)) +
+    geom_boxplot(color = 'steelblue') +
+    labs(x = 'Previously Accepted Campaigns')
+```
+
+-   Plot illustrating positive effect of previously accepted campaigns on income
+
+```{r}
+#boxplot Income by Response
+ggplot(marketing, aes(x = as.character(Response), y = Income)) +
+    geom_boxplot(color = 'steelblue') +
+    labs(x = 'Response', y = 'Annual Income')
+```
+
+```{r}
+#boxplot Minors Home by accepted previous
+ggplot(marketing, aes(x = as.character(AcceptedPrv), y = MinorsHome)) +
+    geom_boxplot(color = 'steelblue') +
+    labs(x = 'Previously Accepted Campaigns', y = 'Kids at Home')
+```
+
+-   Plot showing the non correlation between Kids at Home and Previously Accepted Campaigns
+
+```{r}
+#boxplot amount spent by Minors Home
+ggplot(marketing, aes(x = as.character(MinorsHome), y = MntSpent)) +
+    geom_boxplot(color = 'steelblue') +
+    labs(x = 'Kids at Home', y = 'Amount Spent')
+```
+
+-   Plot illustrating the negative effect of amount spent on kids at home
+
+```{r}
+#boxplot Age by accepted previous
+ggplot(marketing, aes(x = as.character(AcceptedPrv), y = Age)) +
+    geom_boxplot(color = 'steelblue') +
+    labs(x = 'Previously Accepted Campaigns', y = 'Age')
+```
+
+-   Plot illustrating the 0 correlation between Age and Previously Accepted Campaigns
+
+```{r}
+#boxplot Recency by Response
+ggplot(marketing, aes(x = as.character(Response), y = Recency)) +
+    geom_boxplot(color = 'steelblue') +
+    labs(x = 'Response', y = 'Recency')
+```
+
+-   Plot illustrating a slightly negative relationship between Response and Recency
+
+```{r}
+
+
+ggplot(marketing, aes(x = as.character(AcceptedPrv), fill = Education)) +
+    geom_bar(position = 'stack') +
+    labs(x = 'Previously Accepted Campaigns', fill = 'Education')
+
+chisq <- chisq.test(table(marketing$AcceptedPrv, marketing$Education))
+chisq
+
+round(chisq$residuals, 3)
+
+```
+
+-   This bar chart is interesting for several reasons. On the x axis we see the number of campaigns a customer has previously accepted. Each bar is then subdivided to show the share each education level represents. Many customers have never accepted a campaign before and the distribution tails off with an exceptionally low number of Customers having accepted 4 previous campaigns and none having accepted all 5 previous.
+
+-   We can conduct a chi-squared test to find if any education level is predisposed to accepting less or more of our previous campaigns. Unfortunately, no statistically significant difference between education levels and previously accepted campaigns is found, meaning that education levels are represented in equal proportions in any of our bars in this chart.
+
+```{r}
+#Relationship by whether Accepted previous campaign
+
+ggplot(marketing, aes(x = as.character(AcceptedPrv), fill = as.character(Response) )) +
+    geom_bar(position = 'stack') +
+    labs(x = 'Previously Accepted Campaigns', fill = 'Response')
+
+chisq <- chisq.test(table(marketing$AcceptedPrv, marketing$Response))
+chisq
+
+round(chisq$residuals, 3)
+
+```
+
+-   This time our chi-squared test has shown a difference between groups. When we visualize this, we find that there's a much greater expectation a customer has participated in our recent campaign if they have accepted at least one last campaign, especially if they've accepted exactly 3 previous campaigns. If they haven't engaged with our current campaign they are much less likely to have participated any previous campaigns. This suggests that if we can get customers to participate in at least one campaign, they have a much greater chance of continuing their involvement in our company.
+
+```{r}
+#bar chart of most successful marketing campaign
+cmps <- c('AcceptedCmp1', 'AcceptedCmp2', 'AcceptedCmp3', 'AcceptedCmp4', 'AcceptedCmp5', 'Response')
+
+#considering making a function out of this from how much I use these lines of code
+cmp.df <- marketing %>%
+    select(cmps) %>% summarize_each(sum) %>%
+    t() %>% as.data.frame() %>%
+    rownames_to_column('Campaigns') #two columns, one is name of column and the next is totals
+
+#clean up the structure for easier manipulation
+cmp.df <- cmp.df %>%
+    mutate(Percents = V1 / nrow(marketing)) %>% #create percents
+    select(-V1) #drop sums
+
+#bar plot
+ggplot(cmp.df, aes(y = reorder(Campaigns, Percents), x = Percents)) +
+    geom_bar(stat = 'identity', fill = 'steelblue') +
+    labs(x = 'Percentage', y = 'Campaigns')
+```
+
+-   The last visualization we'll do here is a bar graph of the percentage of customers who accepted each of our campaigns. As we can see, the second campaign did the least well, failing to engage even 5% of our enrolled customers. We might learn the most by discussing the mistakes in that campaign. Other previous campaigns have had similar engagement to one another, having been accepted by more than 5% of the customer's enrolled.
+
+-   Unlike the other campaigns, the current campaign has done wonders better, engaging 15% more than other campaigns, a near 300% increase in engagement. We can say matter-of-factly that our current campaign is the most successful while the second campaign was the least successful.
+
+```{r}
+str(marketing)
+```
+
+# Data Preprocessing - One-hot Encoding for Education/Rel_Status
+
+```{r}
+
+# Perform one-hot encoding on the 'category' column
+encoded_data <- model.matrix(~ Education - 1, data = marketing)
+ohe_data <- cbind(marketing, encoded_data)
+encoded_data <- model.matrix(~ Rel_Status - 1, data = ohe_data)
+ohe_data <- cbind(ohe_data , encoded_data)
+head( ohe_data )
+```
+
+```{r}
+
+#ohe_data$Dt_Customer = as.factor(ohe_data$Dt_Customer)
+ohe_data = ohe_data[,-c(34,27,10)]
+ohe_data$Response = as.factor(ohe_data$Response)
+str( ohe_data )
+```
+
+```{r}
+ohe_data$Campaigns_Accepted = marketing$AcceptedPrv + marketing$Response
+
+# Define the cut points and labels for the categorical variable
+cut_points <- c(-1,0.5,10)
+labels <- c(0, 1)
+
+# Transform the continuous variable into a categorical variable
+ohe_data$Campaigns_Accepted <- cut(ohe_data$Campaigns_Accepted, breaks = cut_points, labels = labels)
+str(ohe_data)
+```
+
+# Variable Selection - Random Forest
+
+-   we want to divide customers into two groups - engaged and non-engaged.
+
+-   Set the target attribute to `CampaignsAccepted`, with a value of 1 if the customer accepted any offer in previous campaigns, and 0 otherwise.
+
+```{r}
+
+
+# Set the number of folds for cross-validation
+k <- 5
+
+# Create empty vectors to store the cross-validation results
+accuracy <- numeric(k)
+recall <- numeric(k)
+precision <- numeric(k)
+specificity <- numeric(k)
+
+# Perform k-fold cross-validation
+for (i in 1:k) {
+  # Create training and testing indices for the current fold
+  test_indices <- ((i - 1) * nrow(ohe_data) / k + 1):(i * nrow(ohe_data) / k)
+  train_indices <- setdiff(1:nrow(ohe_data), test_indices)
+  
+  # Subset the data into training and testing sets
+  train_data <- ohe_data[train_indices, ]
+  test_data <- ohe_data[test_indices, ]
+  train_data <- train_data[,-c(1,2,3,4,5,6,9,26)]
+  test_data <- test_data[,-c(1,2,3,4,5,6,9,26)]
+  
+  # Train the Random Forest model
+  model <- randomForest(Campaigns_Accepted ~ ., data = train_data,importance=T, ntree=2000, mtry=4)
+  varImpPlot(model,main = "Variable Importance Plot",cex = 0.5)
+  #print(varImp(model,scale=TRUE))
+  
+  predtreer <- predict(model, test_data)
+  #Confusion matrix
+  confusion=table(test_data$Campaigns_Accepted, predtreer);confusion
+  
+  # Predict the class labels for the testing set
+  predictions <- predict(model, newdata = test_data)
+  
+  # Calculate and store the accuracy for the current fold
+  accuracy[i] <- sum(predictions == test_data$Campaigns_Accepted) / length(predictions)
+  cm <- confusionMatrix(predictions, test_data$Campaigns_Accepted, positive = '1')
+  recall[i] <- cm$byClass['Sensitivity']
+  precision[i] <- cm$byClass['Precision']
+  specificity[i] <- cm$byClass['Specificity']
+  
+  
+}
+
+# Compute the average accuracy across all folds
+mean_accuracy <- mean(accuracy)
+avg_recall <- mean(recall)
+avg_precision <- mean(precision)
+avg_specificity <- mean(specificity)
+
+
+# Print the cross-validation results
+print(paste('accuracy:',accuracy))
+print(paste('recall:',recall))
+print(paste('precision:',precision))
+print(paste('specificity:',specificity))
+
+print(paste('mean accuracy:',mean_accuracy))
+print(paste('mean recall:',avg_recall))
+print(paste('mean precision:',avg_precision))
+print(paste('mean specificity:',avg_specificity))
+
+
+```
+
+# Customer Segmentation - K-means clustering
+
+```{r}
+
+# Perform k-means clustering
+k <- 2 # Number of clusters
+set.seed(101)  # Set a seed for reproducibility
+
+# Specify the column names to extract
+
+
+# Extract the specified columns from the dataframe
+
+all_data.n <- marketing %>% dplyr::select(where(is.numeric))
+#all_data.n$Total_Campaigns_Accepted <- marketing$AcceptedPrv + marketing$Response
+#all_data.n$Campaigns_Accepted <- ohe_data$Campaigns_Accepted
+all_data.n <- as.data.frame(apply(all_data.n, 2, function(x) (x - min(x)) / (max(x) - min(x))))
+
+
+
+
+
+
+kmeans_result_1 =  kmeans(all_data.n, centers = k)
+
+# Access the cluster assignments
+#cluster_assignments <- kmeans_result_1$cluster
+clusplot(all_data.n, kmeans_result_1$cluster, color = T, shade = T, labels = 2, main = "K-means Clustering for K=2 using all numeric variables")
+
+
+
+all_data <- marketing
+#all_data$Total_Campaigns_Accepted <- marketing$AcceptedPrv + marketing$Response
+selected_cols <- c('MntSpent','MntWines','MntMeatProducts','Income','MntGoldProds','NumStorePurchases')
+
+kmeans_data <- all_data.n[, selected_cols]
+#kmeans_data$Total_Campaigns_Accepted <- marketing$AcceptedPrv + marketing$Response
+#kmeans_data <- as.data.frame(apply(kmeans_data, 2, function(x) (x - min(x)) / (max(x) - min(x))))
+
+kmeans_result_2 = kmeans(kmeans_data, centers = k)
+
+# Access the cluster assignments
+cluster_assignments <- kmeans_result_2$cluster
+clusplot(kmeans_data, kmeans_result_2$cluster, color = T, shade = T, labels = 2, main = "K-means Clustering for K=2 using variables with high importance score")
+
+
+
+
+```
+
+## Assess the quality of clustering through silhouette width
+
+```{r}
+# Load required package
+# Calculate Silhouette coefficients
+
+silhouette =  silhouette(kmeans_result_1$cluster, dist(all_data.n))
+
+# Plot the Silhouette coefficients
+# plot(silhouette, main = "Silhouette Plot for k-means Clustering using all numeric variables",col = c("red", "green"))
+fviz_silhouette(silhouette)
+
+silhouette = silhouette(kmeans_result_2$cluster, dist(kmeans_data))
+
+# Plot the Silhouette coefficients
+#plot(silhouette, main = "Silhouette Plot for k-means Clustering using variables with high importance score",col = c("red", "green"))
+fviz_silhouette(silhouette)
+
+```
+
+## Visualize the result of clustering
+
+```{r}
+#library(ggplot2)
+#library(ggpubr)
+# Assuming you have a dataframe named 'data' containing your data, and 'target' is the column containing the class labels
+
+# Install and load the necessary package
+
+# Select the columns for pair plotting
+
+plot_data <- marketing
+plot_data$kmeans_cluster <- cluster_assignments
+columns_to_plot <- c('MntSpent','MntWines','MntMeatProducts','Income','MntGoldProds','NumStorePurchases')
+
+# Add the 'target' column to the selected columns
+columns_to_plot <- c(columns_to_plot, 'kmeans_cluster')
+
+# Subset the data based on the selected columns
+data_subset <- plot_data[, columns_to_plot]
+
+data_subset$kmeans_cluster <- as.factor(data_subset$kmeans_cluster)
+# Draw pair plots
+
+ggpairs(data_subset, columns = 1:length(columns_to_plot), aes(color = kmeans_cluster)) +
+  theme(axis.text = element_text(size = 5),
+       strip.text.x = element_text(size = 7),
+           strip.text.y = element_text(size = 4)
+        )  # Adjust the font size
+
+
+```
+
+The customer in Cluster 2 tends to
+
+-   spend more
+
+-   shop more frequently in stores
+
+-   have higher Income
+
+```{r}
+
+plot_data$kmeans_cluster <- factor(plot_data$kmeans_cluster)
+
+
+ggplot(plot_data, aes(x = as.character(AcceptedPrv), fill = kmeans_cluster)) +
+    geom_bar(position = 'stack') +
+    labs(x = 'Previously Accepted Campaigns', 
+         fill = 'Cluster',
+         title = 'Distribution of Previously Accepted Campaigns Across Clusters')
+
+
+```
+
+```{r}
+plot_data$kmeans_cluster <- factor(plot_data$kmeans_cluster)
+
+
+ggplot(plot_data, aes(x = as.character(Response), fill = kmeans_cluster)) +
+    geom_bar(position = 'stack') +
+    labs(x = 'if customer accepted the offer in the last campaign', 
+         fill = 'Cluster',
+         title = 'Customer Response Distribution by Previous Campaign Acceptance')
+
+ggsave("plot.png", width = 8, height = 6, dpi = 300)
+```
+
+```{r}
+#library(ggplot2)
+#library(ggpubr)
+# Assuming you have a dataframe named 'data' containing your data, and 'target' is the column containing the class labels
+
+# Install and load the necessary package
+
+my_colors <- c("pink", "#339CFF") 
+
+# Select the columns for pair plotting
+columns_to_plot <- c('MntSpent','MntWines','MntMeatProducts','Income','MntGoldProds','NumStorePurchases')
+
+# Add the 'target' column to the selected columns
+columns_to_plot <- c(columns_to_plot, 'Campaigns_Accepted')
+
+# Subset the data based on the selected columns
+data_subset <- ohe_data[, columns_to_plot]
+
+data_subset$Campaigns_Accepted <- as.factor(data_subset$Campaigns_Accepted)
+# Draw pair plots
+ggpairs(data_subset, columns = 1:length(columns_to_plot), aes(color = Campaigns_Accepted)) +
+  theme(axis.text = element_text(size = 6), # Adjust the font size
+       strip.text.x = element_text(size = 7),
+           strip.text.y = element_text(size = 4)
+        )  +
+  scale_color_manual(values = my_colors) +
+  scale_fill_manual(values = my_colors)# Set custom color palette
+
+
+```
+
+# Validate the association between 
+
+# `CampaignsAccepted`and the variables with high importance score
+
+-   We would need to transform the numerical variables to categorical variables before performing chi-square test
+
+```{r}
+# Create a continuous variable
+
+data <- marketing
+data$Campaigns_Accepted <- ohe_data$Campaigns_Accepted
+
+# Define the cut points and labels for the categorical variable
+cut_points <- c(0,800,3000)
+labels <- c("Low", "High")
+
+# Transform the continuous variable into a categorical variable
+data$MntSpent <- cut(data$MntSpent, breaks = cut_points, labels = labels)
+
+chisq <- chisq.test(table(data$MntSpent, data$Campaigns_Accepted))
+chisq
+effect_size <- assocstats(table(data$MntSpent, data$Campaigns_Accepted))
+effect_size
+round(chisq$residuals, 3)
+corrplot(chisq$residuals, is.cor = FALSE)
+
+```
+
+-   p-value \< 2.2e-16 \>\> statistically significant \>\> there is association between Campaigns_Accepted and MntSpent
+-   Cramer's V = 0.309 \> medium effect
+-   
+
+```{r}
+# Create a continuous variable
+data <- marketing
+data$Campaigns_Accepted <- ohe_data$Campaigns_Accepted
+```
+
+```{r}
+
+
+
+# Define the cut points and labels for the categorical variable
+cut_points <- c(0,500,3000)
+labels <- c("Low", "High")
+
+# Transform the continuous variable into a categorical variable
+data$MntWines <- cut(data$MntWines, breaks = cut_points, labels = labels)
+
+chisq <- chisq.test(table(data$MntWines, data$Campaigns_Accepted))
+chisq
+effect_size <- assocstats(table(data$MntWines, data$Campaigns_Accepted))
+effect_size
+round(chisq$residuals, 3)
+corrplot(chisq$residuals, is.cor = FALSE)
+
+```
+
+-   p-value \< 2.2e-16 \>\> statistically significant \>\> there is association between Campaigns_Accepted and MntSpent
+-   Phi-Coefficient = 0.356 \>\> medium effect
+
+```{r}
+
+
+# Define the cut points and labels for the categorical variable
+cut_points <- c(0,300,3000)
+labels <- c("Low", "High")
+
+# Transform the continuous variable into a categorical variable
+data$MntMeatProducts <- cut(data$MntMeatProducts, breaks = cut_points, labels = labels)
+
+chisq <- chisq.test(table(data$MntMeatProducts, data$Campaigns_Accepted))
+chisq
+effect_size <- assocstats(table(data$MntMeatProducts, data$Campaigns_Accepted))
+effect_size
+round(chisq$residuals, 3)
+corrplot(chisq$residuals, is.cor = FALSE)
+
+```
+
+-   p-value \< 2.2e-16 \>\> statistically significant \>\> there is association between Campaigns_Accepted and MntMeatProducts
+-   Phi-Coefficient = 0.254 \>\> moderate effect
+
+```{r}
+
+
+# Define the cut points and labels for the categorical variable
+cut_points <- c(0,80,1000)
+labels <- c("Low", "High")
+
+# Transform the continuous variable into a categorical variable
+data$MntGoldProds <- cut(data$MntGoldProds, breaks = cut_points, labels = labels)
+
+chisq <- chisq.test(table(data$MntGoldProds, data$Campaigns_Accepted))
+chisq
+effect_size <- assocstats(table(data$MntGoldProds, data$Campaigns_Accepted))
+effect_size
+round(chisq$residuals, 3)
+corrplot(chisq$residuals, is.cor = FALSE)
+
+```
+
+-   p-value = 2.843e-11 \>\> statistically significant \>\> there is association between Campaigns_Accepted and MntSpent
+-   Phi-Coefficient = 0.113 \>\> small effect
+
+```{r}
+
+
+# Define the cut points and labels for the categorical variable
+cut_points <- c(0,50000,200000)
+labels <- c("Low","High")
+
+# Transform the continuous variable into a categorical variable
+data$Income <- cut(data$Income, breaks = cut_points, labels = labels)
+
+chisq <- chisq.test(table(data$Income, data$Campaigns_Accepted))
+chisq
+effect_size <- assocstats(table(data$Income, data$Campaigns_Accepted))
+effect_size
+round(chisq$residuals, 3)
+corrplot(chisq$residuals, is.cor = FALSE)
+
+```
+
+-   p-value \< 2.2e-16 \>\> statistically significant \>\> there is association between Campaigns_Accepted and MntSpent
+-   Cramer's V = 0.204 \>\> small effect
+
+```{r}
+
+
+
+# Define the cut points and labels for the categorical variable
+cut_points <- c(0,5,100)
+labels <- c("Low", "High")
+
+# Transform the continuous variable into a categorical variable
+data$NumStorePurchases <- cut(data$NumStorePurchases, breaks = cut_points, labels = labels)
+
+chisq <- chisq.test(table(data$NumStorePurchases, data$Campaigns_Accepted))
+chisq
+effect_size <- assocstats(table(data$NumStorePurchases, data$Campaigns_Accepted))
+effect_size
+round(chisq$residuals, 3)
+corrplot(chisq$residuals, is.cor = FALSE)
+
+```
+
+-   p-value = 4.554e-15 \>\> statistically significant \>\> there is association between Campaigns_Accepted and MntSpent
+-   Cramer's V = 0.177 \>\> small effect
