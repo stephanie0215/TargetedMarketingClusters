@@ -31,6 +31,9 @@
   </p>
 </div>
 
+### Built With
+
+[![R](https://img.shields.io/badge/R-276DC3?style=for-the-badge&logo=r&logoColor=white)](https://www.r-project.org/)
 
 
 <!-- TABLE OF CONTENTS -->
@@ -63,19 +66,16 @@
 <!-- ABOUT THE PROJECT -->
 ## Dataset Overview: Customer Campaign Responses
 
-<p>
 This dataset contains information about customer interactions with marketing campaigns conducted by a retail company. Each record represents a unique customer and includes various attributes related to their demographic characteristics, purchasing behavior, and responses to marketing offers. 
 For more information, please visit the [Kaggle dataset page](https://www.kaggle.com/datasets/rodsaldanha/arketing-campaign/data).
-</p>
+
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
-### Built With
 
-[![R](https://img.shields.io/badge/R-276DC3?style=for-the-badge&logo=r&logoColor=white)](https://www.r-project.org/)
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
