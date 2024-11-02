@@ -16,6 +16,9 @@
 
 <h1 align="center">Optimizing Targeted Marketing with Customer Segmentation</h1>
 <div align="center">
+  <a href="https://github.com/github_username/repo_name">
+    <img src="https://www.tidio.com/wp-content/uploads/Customer-segmentation-min.png" alt="Customer Segmentation" width="80" height="80">
+  </a>
 
   <p align="left">
     <li>Customer segmentation is essential for retailers aiming to improve marketing effectiveness by tailoring strategies to distinct customer groups. By identifying key segments, retailers can enhance the return on marketing efforts and develop more targeted campaigns.</li>
