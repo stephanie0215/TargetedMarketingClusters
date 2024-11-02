@@ -151,9 +151,9 @@ To run this project, ensure you have the following software installed:
 <!-- Result-->
 ## Result
 
-To view the results of this project, please visit the following links:
-- [R Markdown File](https://github.com/stephanie0215/TargetedMarketingClusters/blob/main/Customer%20Segmentation.Rmd)
+To view the results of this project, please visit the following link:
 - [Project Overview PDF](https://github.com/stephanie0215/TargetedMarketingClusters/blob/main/Targeted_Marketing_Segmentation_Overview.pdf)
+- [Download HTML File] (https://github.com/stephanie0215/TargetedMarketingClusters/blob/main/Customer-Segmentation.html)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
