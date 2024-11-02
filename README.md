@@ -93,12 +93,8 @@ The key features of the dataset are as follows:
 - **NumWebVisitsMonth**: The number of visits the customer made to the company's website in the last month.
 
 
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-
+### Data Source
+For more information, please visit the [Kaggle dataset page](https://www.kaggle.com/datasets/rodsaldanha/arketing-campaign/data).
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
