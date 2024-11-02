@@ -22,7 +22,7 @@
     <br />
     <li> This project applies clustering algorithms, specifically k-means, to perform customer segmentation. To determine which attributes are most relevant for clustering, a Random Forest model is used to identify key variables, allowing for the exclusion of less relevant attributes and improving the focus of the analysis.</li>
     <br />
-    <a href="https://github.com/github_username/repo_name"><strong>Project Overview »</strong></a>
+    <a href="https://github.com/stephanie0215/TargetedMarketingClusters/blob/main/Targeted_Marketing_Segmentation_Overview.pdf"><strong>Project Overview »</strong></a>
     <br />
     <br />
     <a href="https://github.com/github_username/repo_name">View Demo</a>
