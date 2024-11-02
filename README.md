@@ -70,7 +70,27 @@ Built With
 ## Dataset Overview: Customer Campaign Responses
 
 This dataset contains information about customer interactions with marketing campaigns conducted by a retail company. Each record represents a unique customer and includes various attributes related to their demographic characteristics, purchasing behavior, and responses to marketing offers. 
-For more information, please visit the [Kaggle dataset page](https://www.kaggle.com/datasets/rodsaldanha/arketing-campaign/data).
+The key features of the dataset are as follows:
+### Campaign Response Variables:
+- **AcceptedCmp1 to AcceptedCmp5**: Binary indicators (1/0) indicating whether the customer accepted offers in the first five campaigns.
+- **Response**: A binary target variable (1/0) that indicates whether the customer accepted the offer in the most recent campaign.
+
+### Customer Demographics:
+- **DtCustomer**: The date when the customer enrolled with the company.
+- **Education**: The customer's level of education.
+- **Marital**: The marital status of the customer.
+- **Kidhome**: The number of small children in the customer's household.
+- **Teenhome**: The number of teenagers in the customer's household.
+- **Income**: The yearly household income of the customer.
+
+### Customer Behavior:
+- **Complain**: A binary variable indicating whether the customer has lodged a complaint in the last two years.
+- **Recency**: The number of days since the customer's last purchase.
+
+### Purchasing Behavior:
+- **MntFishProducts, MntMeatProducts, MntFruits, MntSweetProducts, MntWines, MntGoldProds**: These variables represent the total amount spent on various product categories over the last two years.
+- **NumDealsPurchases, NumCatalogPurchases, NumStorePurchases, NumWebPurchases**: Counts of purchases made under different conditions, such as using discounts or through specific sales channels.
+- **NumWebVisitsMonth**: The number of visits the customer made to the company's website in the last month.
 
 
 
