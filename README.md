@@ -155,10 +155,10 @@ To run this project, ensure you have the following software installed:
 ## Result
 
 To view the results of this project, please visit the following links:
-- [R Markdown File]([https://www.kaggle.com/datasets/rodsaldanha/arketing-campaign/data](https://github.com/stephanie0215/TargetedMarketingClusters/blob/main/Customer%20Segmentation.Rmd)
-- [Project Overview PDF](https://github.com/stephanie0215/TargetedMarketingClusters/blob/main/Targeted_Marketing_Segmentation_Overview.pdf).
+- [R Markdown File](https://github.com/stephanie0215/TargetedMarketingClusters/blob/main/Customer%20Segmentation.Rmd)
+- [Project Overview PDF](https://github.com/stephanie0215/TargetedMarketingClusters/blob/main/Targeted_Marketing_Segmentation_Overview.pdf)
 
-
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 <!-- CONTACT -->
@@ -170,10 +170,6 @@ Project Link: [https://github.com/github_username/repo_name](https://github.com/
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
