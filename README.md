@@ -19,7 +19,7 @@
 
   <p align="center">
     Customer segmentation is essential for retailers aiming to improve marketing effectiveness by tailoring strategies to distinct customer groups. By identifying key segments, retailers can enhance the return on marketing efforts and develop more targeted campaigns.
-
+    <br />
     This project applies clustering algorithms, specifically k-means, to perform customer segmentation. To determine which attributes are most relevant for clustering, a Random Forest model is used to identify key variables, allowing for the exclusion of less relevant attributes and improving the focus of the analysis.
     <br />
     <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a>
