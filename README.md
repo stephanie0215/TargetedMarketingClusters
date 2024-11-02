@@ -163,7 +163,7 @@ To view the results of this project, please visit the following links:
 
 Yung-Hui (Stephanie Pan)- [@linkedin](https:/www.linkedin.com/in/stephanieyhpan) - stephanie22335@gmail.com
 
-Project Link: [https://github.com/github_username/repo_name](https://github.com/github_username/repo_name)
+Project Link: [https://github.com/stephanie0215/TargetedMarketingClusters](https://github.com/stephanie0215/TargetedMarketingClusters)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
