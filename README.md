@@ -41,19 +41,19 @@ Built With
   <summary>Click to expand</summary>
   <ol>
     <li>
-      <a href="#Dataset used">Dataset used</a>
+      <a href="#dataset-used">Dataset used</a>
       <ul>
-        <li><a href="#Data Source">Data Source</a></li>
+        <li><a href="#data-source">Data Source</a></li>
       </ul>
     </li>
     <li>
-      <a href="#Installation Guide">Installation Guide</a>
+      <a href="#installation-guide">Installation Guide</a>
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#Installation Steps"> Installation Steps</a></li>
+        <li><a href="#installation-steps"> Installation Steps</a></li>
       </ul>
     </li>
-    <li><a href="#Result">Result</a></li>
+    <li><a href="#result">Result</a></li>
     <li><a href="#contact">Contact</a></li>
   </ol>
 </details>
