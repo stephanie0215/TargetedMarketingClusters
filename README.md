@@ -17,7 +17,9 @@
 <h1 align="center">Optimizing Targeted Marketing with Customer Segmentation</h1>
 <div align="left">
   <a href="https://github.com/stephanie0215/TargetedMarketingClusters/blob/main/Customer%20Segmentation.Rmd">
-    <img align = "middle" src="https://www.tidio.com/wp-content/uploads/Customer-segmentation-min.png" alt="Customer Segmentation" width="400" height="200">
+    <div style="text-align: center;">
+      <img align = "middle" src="https://www.tidio.com/wp-content/uploads/Customer-segmentation-min.png" alt="Customer Segmentation" width="400" height="200">
+    </div>
   </a>
 
 <ul>
