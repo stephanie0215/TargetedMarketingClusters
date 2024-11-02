@@ -14,11 +14,12 @@
 
 
 
-<h3 align="center">Optimizing Targeted Marketing with Data-Driven Customer Segmentation![image](https://github.com/user-attachments/assets/f81c3e38-35f3-4ffe-9f18-c2553693b206)
-</h3>
+<h3 align="center">Optimizing Targeted Marketing with Data-Driven Customer Segmentation</h3>
 
   <p align="center">
-    project_description
+    Customer segmentation is essential for retailers aiming to improve marketing effectiveness by tailoring strategies to distinct customer groups. By identifying key segments, retailers can enhance the return on marketing efforts and develop more targeted campaigns.
+
+    This project applies clustering algorithms, specifically k-means, to perform customer segmentation. To determine which attributes are most relevant for clustering, a Random Forest model is used to identify key variables, allowing for the exclusion of less relevant attributes and improving the focus of the analysis.
     <br />
     <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a>
     <br />
