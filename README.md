@@ -102,39 +102,53 @@ For more information, please visit the [Kaggle dataset page](https://www.kaggle.
 
 
 <!-- GETTING STARTED -->
-## Getting Started
+## Installation Guide
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+To run this project, ensure you have the following software installed:
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
+- **R**: Version 4.2.1 or higher
+- **RStudio**: Recommended for an integrated development environment (IDE).
 
-### Installation
+### Installation Steps
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
-   ```sh
-   git clone https://github.com/github_username/repo_name.git
-   ```
-3. Install NPM packages
-   ```sh
-   npm install
-   ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
-5. Change git remote url to avoid accidental pushes to base project
-   ```sh
-   git remote set-url origin github_username/repo_name
-   git remote -v # confirm the changes
-   ```
+1. **Install R**:
+   - Download R from the [CRAN website](https://cran.r-project.org/).
+   - Follow the installation instructions specific to your operating system (macOS, Windows, Linux).
+
+2. **Install RStudio** (optional but recommended):
+   - Download RStudio from the [RStudio website](https://www.rstudio.com/products/rstudio/download/).
+   - Follow the installation instructions.
+
+3. **Install Required Packages**:
+   - Open R or RStudio and run the following commands to install the necessary packages with their specified versions:
+
+   ```R
+   install.packages(c("factoextra" = "1.0.7", 
+                      "cluster" = "2.1.4", 
+                      "e1071" = "1.7-13", 
+                      "rsample" = "1.1.1", 
+                      "ranger" = "0.15.1", 
+                      "caret" = "6.0-93", 
+                      "lattice" = "0.20-45", 
+                      "class" = "7.3-20", 
+                      "randomForest" = "4.7-1.1", 
+                      "vcd" = "1.4-11", 
+                      "corrplot" = "0.92", 
+                      "reshape" = "0.8.9", 
+                      "GGally" = "2.1.2", 
+                      "plyr" = "1.8.8", 
+                      "forcats" = "0.5.2", 
+                      "stringr" = "1.5.0", 
+                      "dplyr" = "1.1.2", 
+                      "purrr" = "1.0.1", 
+                      "readr" = "2.1.3", 
+                      "tidyr" = "1.3.0", 
+                      "tibble" = "3.2.1", 
+                      "ggplot2" = "3.4.2", 
+                      "tidyverse" = "1.3.2"))
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
