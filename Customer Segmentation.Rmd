@@ -1,7 +1,7 @@
 ---
 title: "Final_Project"
 author: "Stephanie (Yung-Hui) Pan"
-output: pdf_document
+output: html_document
 ---
 
 # Dataset Description:
