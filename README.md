@@ -65,7 +65,7 @@
 
 <p>
 This dataset contains information about customer interactions with marketing campaigns conducted by a retail company. Each record represents a unique customer and includes various attributes related to their demographic characteristics, purchasing behavior, and responses to marketing offers. 
-For more info, please visit <a href = 'https://www.kaggle.com/datasets/rodsaldanha/arketing-campaign/data'></a>
+For more information, please visit the [Kaggle dataset page](https://www.kaggle.com/datasets/rodsaldanha/arketing-campaign/data).
 </p>
 
 
