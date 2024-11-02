@@ -20,15 +20,12 @@
     <img src="https://www.tidio.com/wp-content/uploads/Customer-segmentation-min.png" alt="Customer Segmentation" width="400" height="200">
   </a>
 
-  <p align="left">
-    <li>Customer segmentation is essential for retailers aiming to improve marketing effectiveness by tailoring strategies to distinct customer groups. By identifying key segments, retailers can enhance the return on marketing efforts and develop more targeted campaigns.</li>
-    <br />
-    <li> This project applies clustering algorithms, specifically k-means, to perform customer segmentation. To determine which attributes are most relevant for clustering, a Random Forest model is used to identify key variables, allowing for the exclusion of less relevant attributes and improving the focus of the analysis.</li>
-    <br />
-    <a href="https://github.com/stephanie0215/TargetedMarketingClusters/blob/main/Targeted_Marketing_Segmentation_Overview.pdf"><strong>Project Overview »</strong></a>
-    <br />
-    <br />
-  </p>
+<ul>
+  <li>Customer segmentation is essential for retailers aiming to improve marketing effectiveness by tailoring strategies to distinct customer groups. By identifying key segments, retailers can enhance the return on marketing efforts and develop more targeted campaigns.</li>
+  <li>This project applies clustering algorithms, specifically k-means, to perform customer segmentation. To determine which attributes are most relevant for clustering, a Random Forest model is used to identify key variables, allowing for the exclusion of less relevant attributes and improving the focus of the analysis.</li>
+</ul>
+<a href="https://github.com/stephanie0215/TargetedMarketingClusters/blob/main/Targeted_Marketing_Segmentation_Overview.pdf"><strong>Project Overview »</strong></a>
+
 </div>
 
 Built With
