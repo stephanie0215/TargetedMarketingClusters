@@ -36,9 +36,11 @@ Built With
 [![R](https://img.shields.io/badge/R-276DC3?style=for-the-badge&logo=r&logoColor=white)](https://www.r-project.org/)
 
 
+
+
 <!-- TABLE OF CONTENTS -->
 <details>
-  <summary>Table of Contents</summary>
+  <h3>TABLE OF CONTENTS</h3>
   <ol>
     <li>
       <a href="#about-the-project">About The Project</a>
