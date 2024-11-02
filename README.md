@@ -39,8 +39,9 @@ Built With
 
 
 <!-- TABLE OF CONTENTS -->
+# **TABLE OF CONTENTS**
 <details>
-  <h3>TABLE OF CONTENTS</h3>
+  <summary>Click to expand</summary>
   <ol>
     <li>
       <a href="#about-the-project">About The Project</a>
