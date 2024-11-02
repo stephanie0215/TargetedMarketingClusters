@@ -153,7 +153,7 @@ To run this project, ensure you have the following software installed:
 
 To view the results of this project, please visit the following link:
 - [Project Overview PDF](https://github.com/stephanie0215/TargetedMarketingClusters/blob/main/Targeted_Marketing_Segmentation_Overview.pdf)
-- [Download HTML File] (https://github.com/stephanie0215/TargetedMarketingClusters/blob/main/Customer-Segmentation.html)
+- [Download HTML File](https://github.com/stephanie0215/TargetedMarketingClusters/blob/main/Customer-Segmentation.html)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
