@@ -61,11 +61,13 @@
 
 
 <!-- ABOUT THE PROJECT -->
-## About The Project
+## Dataset Overview: Customer Campaign Responses
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+<p>
+This dataset contains information about customer interactions with marketing campaigns conducted by a retail company. Each record represents a unique customer and includes various attributes related to their demographic characteristics, purchasing behavior, and responses to marketing offers. 
+For more info, please visit <a href = 'https://www.kaggle.com/datasets/rodsaldanha/arketing-campaign/data'></a>
+</p>
 
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description`
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -73,7 +75,7 @@ Here's a blank template to get started: To avoid retyping too much info. Do a se
 
 ### Built With
 
-* [![R](https://img.shields.io/badge/R-276DC3?style=for-the-badge&logo=r&logoColor=white)](https://www.r-project.org/)
+[![R](https://img.shields.io/badge/R-276DC3?style=for-the-badge&logo=r&logoColor=white)](https://www.r-project.org/)
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
