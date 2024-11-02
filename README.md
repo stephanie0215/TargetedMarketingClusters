@@ -67,7 +67,7 @@ Built With
 
 
 <!-- ABOUT THE PROJECT -->
-## Dataset Overview: Customer Campaign Responses
+## Dataset used: Customer Campaign Responses
 
 This dataset contains information about customer interactions with marketing campaigns conducted by a retail company. Each record represents a unique customer and includes various attributes related to their demographic characteristics, purchasing behavior, and responses to marketing offers. 
 The key features of the dataset are as follows:
