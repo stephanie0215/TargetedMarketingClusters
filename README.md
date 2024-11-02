@@ -73,7 +73,7 @@ Here's a blank template to get started: To avoid retyping too much info. Do a se
 
 ### Built With
 
-* [![R][R]][Next-url]
+* [![R](https://img.shields.io/badge/R-276DC3?style=for-the-badge&logo=r&logoColor=white)](https://www.r-project.org/)
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
