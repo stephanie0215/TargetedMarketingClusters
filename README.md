@@ -14,16 +14,8 @@
 
 
 
-/*
-<!-- PROJECT LOGO -->
-<br />
-<div align="center">
-  <a href="https://github.com/github_username/repo_name">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
-  </a>
-*/
-
-<h3 align="center">project_title</h3>
+<h3 align="center">Optimizing Targeted Marketing with Data-Driven Customer Segmentation![image](https://github.com/user-attachments/assets/f81c3e38-35f3-4ffe-9f18-c2553693b206)
+</h3>
 
   <p align="center">
     project_description
