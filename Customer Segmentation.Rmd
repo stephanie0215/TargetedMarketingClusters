@@ -1,37 +1,63 @@
 ---
 title: "Final_Project"
 author: "Stephanie (Yung-Hui) Pan"
-output: html_document
+output: pdf_document
 ---
 
 # Dataset Description:
 
 -   ID: the unique identification code for every customer
+
 -   Year_Birth: The Year of a customer's birth
+
 -   Education: The level of education that a customer completed
+
 -   Marital_Status: Status of Marriage
+
 -   Income: Annual Income
+
 -   Kidhome: \# of children under the age of 13 in Customer's household
+
 -   Teenhome: \# of children between 13-19 in Customer's household
+
 -   Dt_Customer: Date of Customer Enrollment
+
 -   Recency: \# of days since last purchase
+
 -   MntWines: Dollar amount of Wines purchased in last 2 years
+
 -   MntFruits: Dollar amount of Fruits purchased in last 2 years
+
 -   MntMeatProducts: Dollar amount of Meat products purchased in the last 2 years
+
 -   MntFishProducts: Dollar amount of Fish products purchased in the last 2 years
+
 -   MntSweetProducts: Dollar amount of Sweet products purchased in the last 2 years
+
 -   MntGoldProds: Dollar amount of Gold products purchased in the last 2 years
+
 -   NumDealsPurchases: \# of purchases made with discount
+
 -   NumWebPurchases: \# of purchases made through the company's website
+
 -   NumCatalogPurchases: \# of purchases made using the catalog
+
 -   NumStorePurchases: \# of purchases made directly in-store
+
 -   NumWebVisitsMonth: \# of visits made through company's website
+
 -   AcceptedCmp1: 1 if customer accepted the offer in the 1st campaign, 0 otherwise
+
 -   AcceptedCmp2: 1 if customer accepted the offer in the 2nd campaign, 0 otherwise
+
 -   AcceptedCmp3: 1 if customer accepted the offer in the 3rd campaign, 0 otherwise
+
 -   AcceptedCmp4: 1 if customer accepted the offer in the 4th campaign, 0 otherwise
+
 -   AcceptedCmp5: 1 if customer accepted the offer in the 5th campaign, 0 otherwise
+
 -   Complain: 1 if customer complained in the last 2 years, 0 otherwise
+
 -   Response: 1 if customer accepted the offer in the last campaign, 0 otherwise
 
 ```{r}
@@ -39,7 +65,7 @@ options(warn = -1)
 Sys.setenv(LANGUAGE = "en")
 ```
 
-```{r}
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
 library(tidyverse)
 library(plyr) #count()
 library(GGally) #ggcorr() and ggpairs()
@@ -49,7 +75,7 @@ library(dplyr)
 library(vcd)
 ```
 
-```{r}
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
 #second library import
 library(randomForest)
 library(class)
@@ -707,7 +733,6 @@ ggplot(plot_data, aes(x = as.character(Response), fill = kmeans_cluster)) +
          fill = 'Cluster',
          title = 'Customer Response Distribution by Previous Campaign Acceptance')
 
-ggsave("plot.png", width = 8, height = 6, dpi = 300)
 ```
 
 ```{r}
@@ -741,7 +766,7 @@ ggpairs(data_subset, columns = 1:length(columns_to_plot), aes(color = Campaigns_
 
 ```
 
-# Validate the association between 
+# Validate the association between
 
 # `CampaignsAccepted`and the variables with high importance score
 
