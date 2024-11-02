@@ -155,13 +155,12 @@ To run this project, ensure you have the following software installed:
 
 
 <!-- USAGE EXAMPLES -->
-## Usage
+## Result
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+To view the result, please visit 
+- [Rmd file](https://www.kaggle.com/datasets/rodsaldanha/arketing-campaign/data)
+- [Project Overview](https://www.kaggle.com/datasets/rodsaldanha/arketing-campaign/data).
 
-_For more examples, please refer to the [Documentation](https://example.com)_
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
