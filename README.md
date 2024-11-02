@@ -14,7 +14,8 @@
 
 
 
-<h1 align="center">Optimizing Targeted Marketing with Data-Driven Customer Segmentation</h1>
+<h1 align="center">Optimizing Targeted Marketing with Customer Segmentation</h1>
+<div align="center">
 
   <p align="center">
     Customer segmentation is essential for retailers aiming to improve marketing effectiveness by tailoring strategies to distinct customer groups. By identifying key segments, retailers can enhance the return on marketing efforts and develop more targeted campaigns.
